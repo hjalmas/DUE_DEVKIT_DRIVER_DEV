@@ -51,12 +51,8 @@ void SDRAMC_Handler     ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 #endif /* _SAM3XA_SDRAMC_INSTANCE_ */
 void PIOA_Handler       ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 void PIOB_Handler       ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
-#ifdef _SAM3XA_PIOC_INSTANCE_
 void PIOC_Handler       ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
-#endif /* _SAM3XA_PIOC_INSTANCE_ */
-#ifdef _SAM3XA_PIOD_INSTANCE_
 void PIOD_Handler       ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
-#endif /* _SAM3XA_PIOD_INSTANCE_ */
 #ifdef _SAM3XA_PIOE_INSTANCE_
 void PIOE_Handler       ( void ) __attribute__ ((weak, alias("Dummy_Handler")));
 #endif /* _SAM3XA_PIOE_INSTANCE_ */
@@ -158,16 +154,9 @@ pHandler __isr_vectors[] =
 #endif /* _SAM3XA_SDRAMC_INSTANCE_ */
 	(void*) PIOA_Handler,    /* 11 Parallel IO Controller A */
 	(void*) PIOB_Handler,    /* 12 Parallel IO Controller B */
-#ifdef _SAM3XA_PIOC_INSTANCE_
 	(void*) PIOC_Handler,    /* 13 Parallel IO Controller C */
-#else
-	(void*) (0UL),           /* 13 Reserved */
-#endif /* _SAM3XA_PIOC_INSTANCE_ */
-#ifdef _SAM3XA_PIOD_INSTANCE_
 	(void*) PIOD_Handler,    /* 14 Parallel IO Controller D */
-#else
-	(void*) (0UL),           /* 14 Reserved */
-#endif /* _SAM3XA_PIOD_INSTANCE_ */
+
 #ifdef _SAM3XA_PIOE_INSTANCE_
 	(void*) PIOE_Handler,    /* 15 Parallel IO Controller E */
 #else

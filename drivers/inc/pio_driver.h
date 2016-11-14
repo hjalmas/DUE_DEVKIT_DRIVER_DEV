@@ -31,6 +31,10 @@
 #define INT_LVL_HIGH			1 << 2		/* High level detection */
 #define INT_LVL_LOW				1 << 3		/* Low level detection */
 
+/* Peripheral select register */
+#define PIO_A_PERIPHERAL		0
+#define PIO_B_PERIPHERAL		1
+
 /* Prototypes -------------------------------------------*/
 
 /**
@@ -39,6 +43,11 @@
  * This function can initiate multiple pins on the same port at once.
  */
 void pio_init_pin(Pio* PIO, uint32_t PIN, uint32_t Settings);
+
+/**
+ * Select A- or B-peripheral to control this PIN.
+ */
+void pio_select_AB(Pio* PIO, uint32_t PIN, uint32_t PIO_AB_PERIPHERAL);
 
 /**
  * Configures the specified interrupt modes on the specified pin.
@@ -61,6 +70,11 @@ void pio_set_pin(Pio* PIO, uint32_t PIN, uint32_t state);
  * Toggles the pin (if configured as output).
  */
 void pio_toggle_pin(Pio* PIO, uint32_t PIN);
+
+/**
+ * Read pin.
+ */
+uint32_t pio_read_pin(Pio* PIO, uint32_t PIN);
 
 /**
  * Returns the peripheral ID of the specified Pio instance.

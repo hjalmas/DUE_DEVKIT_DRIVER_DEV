@@ -44,8 +44,8 @@
 #define DISP_74HC_DIR	PIO_PC13	/* arduino pin: 50 DIR=0: MCU->Display, DIR=1: Display->MCU */
 
 /* Reset pin and port */
-#define DISP_RST_PORT	PIOD		/*  */
-#define DISP_RST		PIO_PD0		/* Active LOW reset signal */
+#define DISP_RST_PORT	PIOB		/*  */
+#define DISP_RST		PIO_PB21	/* Active LOW reset signal */
 
 /* Status codes */
 #define DISP_STA0_MSK	1 << 0		/* Command execution capability, 	0:Disabled, 1:Enabled */

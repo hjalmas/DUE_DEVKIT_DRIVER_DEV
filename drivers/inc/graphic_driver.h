@@ -42,6 +42,11 @@ void graph_print_text(char* txt, uint8_t row, uint8_t col, uint8_t TEXT_ALIGN);
 void graph_print_textBox(char* txt, uint8_t row, uint8_t col, uint8_t TEXT_ALIGN);
 
 /**
+ * Clears 1 character on the display.
+ */
+void graph_clear_char(uint8_t row, uint8_t col);
+
+/**
  * Draws a pixel at the specified location on the screen;
  */
 void graph_draw_pixel(uint16_t x, uint16_t y);
@@ -55,5 +60,7 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
  * Draws a rectangle with (x0, y0) in the upper left corner.
  */
 void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
+
+uint8_t a2dispTxt(char ascii);
 
 #endif /* GRAPHIC_DRIVER_H_ */

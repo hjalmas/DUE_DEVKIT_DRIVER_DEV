@@ -44,6 +44,19 @@ void pio_init_pin(Pio* PIO, uint32_t PIN, uint32_t Settings) {
 }
 
 /**
+ * Select A- or B-peripheral to control this PIN.
+ */
+void pio_select_AB(Pio* PIO, uint32_t PIN, uint32_t PIO_AB_PERIPHERAL) {
+	if(PIO_AB_PERIPHERAL == PIO_A_PERIPHERAL) {
+		PIO->PIO_ABSR &= ~PIN;
+		PIO->PIO_PDR = PIN;
+	} else {
+		PIO->PIO_ABSR |= PIN;
+		PIO->PIO_PDR = PIN;
+	}
+}
+
+/**
  * Configures the specified interrupt modes on the specified pin.
  * NOTE: you have to run "pio_init_pin()" before running this function.
  */
@@ -113,6 +126,18 @@ void pio_toggle_pin(Pio* PIO, uint32_t PIN) {
 		PIO->PIO_CODR = PIN;
 	} else {
 		PIO->PIO_SODR = PIN;
+	}
+}
+
+/**
+ * Read pin.
+ */
+uint32_t pio_read_pin(Pio* PIO, uint32_t PIN) {
+
+	if(PIO->PIO_PDSR & PIN) {
+		return 1;
+	} else {
+		return 0;
 	}
 }
 
