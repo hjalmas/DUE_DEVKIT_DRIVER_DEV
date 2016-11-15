@@ -76,6 +76,11 @@ void gui_TextField_select(TextField_t* txtField);
 void gui_TextField_show(TextField_t* txtField);
 
 /**
+ * Set the text contained within a TextField.
+ */
+void gui_TextField_setText(TextField_t* field, char* text);
+
+/**
  * Handles a keypress.
  */
 void gui_handle_keypress(char ch);

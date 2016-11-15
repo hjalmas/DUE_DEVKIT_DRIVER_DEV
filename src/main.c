@@ -3,13 +3,23 @@
 
 /* Variables ------------------------------------------------------------------*/
 extern bool kpadFlag;
-TextField_t txtField;
+TextField_t txtField1;
+TextField_t txtField2;
+TextField_t txtField3;
+TextField_t txtField4;
+TextField_t infoTxt;
+
+TextField_t* textFields[] = { &txtField1, &txtField2, &txtField3, &txtField4 };
+uint32_t txtFIdx = 0;
+
 /* Definitions ----------------------------------------------------------------*/
 
 /* Prototypes -----------------------------------------------------------------*/
 void lcd_example(void);
-void keypad_example(void);
-void cbTextField(void);
+void cbTextField1(void);
+void cbTextField2(void);
+void cbTextField3(void);
+void cbTextField4(void);
 
 /* Compiler stuff -------------------------------------------------------------*/
 /**
@@ -45,10 +55,17 @@ int main(int argc, char* argv[]) {
 	graph_print_textBox("~PRESS THE KEYPAD~", 2, 1, TEXT_ALIGN_CENTER);
 	graph_print_text("", 4, 1, TEXT_ALIGN_LEFT);
 
-	gui_TextField_init(&txtField, "Hejsanaowidjwijjnj", 4, 2, 10, 1,
-			cbTextField);
-	gui_TextField_select(&txtField);
-	gui_TextField_show(&txtField);
+	gui_TextField_init(&txtField1, "", 4, 2, 10, 1, cbTextField1);
+	gui_TextField_init(&txtField2, "", 6, 2, 10, 1, cbTextField2);
+	gui_TextField_init(&txtField3, "", 8, 2, 10, 1, cbTextField3);
+	gui_TextField_init(&txtField4, "", 10, 2, 10, 1, cbTextField4);
+	gui_TextField_init(&infoTxt, "", 15, 2, 36, 1, NULL);
+	gui_TextField_show(&txtField1);
+	gui_TextField_show(&txtField2);
+	gui_TextField_show(&txtField3);
+	gui_TextField_show(&txtField4);
+	gui_TextField_show(&infoTxt);
+	gui_TextField_select(&txtField1);
 
 	while (1) {
 		if (kpadFlag) {
@@ -84,6 +101,14 @@ int main(int argc, char* argv[]) {
 				break;
 			case KEY_9:
 				gui_handle_keypress('9');
+				break;
+			case KEY_A:
+				txtFIdx == 0 ? txtFIdx = 3 : txtFIdx--;
+				gui_TextField_select(textFields[txtFIdx]);
+				break;
+			case KEY_B:
+				txtFIdx == 3 ? txtFIdx = 0 : txtFIdx++;
+				gui_TextField_select(textFields[txtFIdx]);
 				break;
 			case KEY_C:
 				gui_handle_keypress(0x08);
@@ -164,8 +189,32 @@ void lcd_example(void) {
 	 */
 }
 
-void cbTextField(void) {
-	trace_puts(txtField.text);
+void cbTextField1(void) {
+	char text[40] = "TextField 1: ";
+	strcat(text, txtField1.text);
+	gui_TextField_setText(&infoTxt, text);
+	gui_TextField_select(&txtField1);
+}
+
+void cbTextField2(void) {
+	char text[40] = "TextField 2: ";
+	strcat(text, txtField2.text);
+	gui_TextField_setText(&infoTxt, text);
+	gui_TextField_select(&txtField2);
+}
+
+void cbTextField3(void) {
+	char text[40] = "TextField 3: ";
+	strcat(text, txtField3.text);
+	gui_TextField_setText(&infoTxt, text);
+	gui_TextField_select(&txtField3);
+}
+
+void cbTextField4(void) {
+	char text[40] = "TextField 4: ";
+	strcat(text, txtField4.text);
+	gui_TextField_setText(&infoTxt, text);
+	gui_TextField_select(&txtField4);
 }
 
 #pragma GCC diagnostic pop
