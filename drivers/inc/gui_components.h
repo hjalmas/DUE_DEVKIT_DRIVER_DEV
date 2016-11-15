@@ -36,11 +36,11 @@
  */
 typedef struct TextField {
 	char text[40];				/* The text contained within this TextField_t instance. */
-	uint32_t row;				/* Row of the first character */
-	uint32_t col;				/* column of the first character, defines location for the TextField */
-	uint32_t width;				/* width in terms of characters */
-	uint32_t height;			/* height in terms of characters */
+	uint16_t row;				/* Row of the first character */
+	uint16_t col;				/* column of the first character, defines location for the TextField */
+	uint16_t width;				/* width in terms of characters */
 	bool isSelected;			/* true if this TextField is selected */
+	char align;					/* Align struct */
 	void (*cbTextField)(void);	/* Callback function for this TextField */
 } TextField_t;
 
@@ -58,10 +58,9 @@ TextField_t* selectedTextField; /* the currently selected TextField */
 void gui_TextField_init(
 		TextField_t* result,
 		char* initText,
-		uint32_t row,				/* Row of the first character */
-		uint32_t col,				/* column of the first character, defines location for the TextField */
-		uint32_t width,				/* width in terms of characters */
-		uint32_t height,			/* height in terms of characters */
+		uint16_t row,				/* Row of the first character */
+		uint16_t col,				/* column of the first character, defines location for the TextField */
+		uint16_t width,				/* width in terms of characters */
 		void (*cbTextField)(void)   /* Callback function for this TextField */
 );
 

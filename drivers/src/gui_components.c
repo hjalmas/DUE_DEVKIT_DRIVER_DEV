@@ -32,8 +32,11 @@ extern uint16_t currFrame;
  * 												PROTOTYPES
  * -----------------------------------------------------------------------------------------------------
  */
-static void print_TextField(TextField_t* txtField);
+static void print_TextField(TextField_t* field);
 static void clear_TextField(TextField_t* field);
+static void set_TextFieldFocus(TextField_t* field);
+static void set_addressPointer(uint16_t row, uint16_t col);
+
 /**
  * -----------------------------------------------------------------------------------------------------
  * 												Declarations
@@ -43,46 +46,45 @@ static void clear_TextField(TextField_t* field);
 /**
  * Initializes a TextField.
  */
-void gui_TextField_init(TextField_t* result, char* initText, uint32_t row, /* Row of the first character */
-uint32_t col, /* column of the first character, defines location for the TextField */
-uint32_t width, /* width in terms of characters */
-uint32_t height, /* height in terms of characters */
-void (*cbTextField)(void) /* Callback function for this TextField */
-) {
-	strcpy(result->text, initText);
-	result->row = row;
-	result->col = col;
-	result->width = width;
-	result->height = height;
-	result->isSelected = false;
-	result->cbTextField = cbTextField;
+void gui_TextField_init(
+		TextField_t* field,			/* The TextField to initialize */
+		char* initText,				/* Text in the TextField */
+		uint16_t row, 				/* Row of the first character */
+		uint16_t col, 				/* column of the first character, defines location for the TextField */
+		uint16_t width, 			/* width in terms of characters */
+		void (*cbTextField)(void) 	/* Callback function for this TextField */
+		) {
+	strcpy(field->text, initText);
+	field->row = row;
+	field->col = col;
+	field->width = width;
+	field->isSelected = false;
+	field->cbTextField = cbTextField;
 }
 
 /**
  * Select textField.
  */
 void gui_TextField_select(TextField_t* field) {
+
 	if (selectedTextField != NULL) {
 		selectedTextField->isSelected = false;
-		selectedTextField = field;
-		field->isSelected = true;
-		gui_TextField_show(field); /* Redraw textfield and highlight edges */
-	} else {
-		selectedTextField = field;
-		field->isSelected = true;
-		gui_TextField_show(field); /* Redraw textfield and highlight edges */
 	}
+
+	selectedTextField = field;
+	field->isSelected = true;
+	set_TextFieldFocus(field);
 }
 
 /**
  * Shows the specified TextField on the screen.
  */
-void gui_TextField_show(TextField_t* txtField) {
-	volatile uint16_t rectWidth = (txtField->width + 1) * 6 + 3;
-	volatile uint16_t x0 = (txtField->col - 1) * 6 - 1, y0 = (txtField->row - 1)
+void gui_TextField_show(TextField_t* field) {
+	volatile uint16_t rectWidth = (field->width + 1) * 6 + 3;
+	volatile uint16_t x0 = (field->col - 1) * 6 - 1, y0 = (field->row - 1)
 			* 8 - 2;
 	graph_draw_rect(x0, y0, rectWidth, 11);
-	print_TextField(txtField);
+	print_TextField(field);
 }
 
 /**
@@ -90,7 +92,7 @@ void gui_TextField_show(TextField_t* txtField) {
  */
 void gui_TextField_setText(TextField_t* field, char* text) {
 	uint32_t length = strlen(text);
-	for (int i = 0; i < length; i++) {
+	for (uint32_t i = 0; i < length; i++) {
 		field->text[i] = *(text + i);
 	}
 	field->text[length] = '\0';
@@ -123,11 +125,17 @@ void gui_handle_keypress(char ch) {
 }
 
 /**
+ * ------------------------------------------------------------------------------------------------------
+ * 											PRIVATE FUNCTIONS
+ * ------------------------------------------------------------------------------------------------------
+ */
+
+/**
  * Prints the text in a TextField
  */
-static void print_TextField(TextField_t* txtField) {
+static void print_TextField(TextField_t* field) {
 
-	TextField_t* f = txtField;
+	TextField_t* f = field;
 	size_t length = strlen(f->text);
 
 	if (length > f->width) {
@@ -144,7 +152,6 @@ static void print_TextField(TextField_t* txtField) {
  * Clears a TextField.
  */
 static void clear_TextField(TextField_t* field) {
-	volatile uint16_t txtLength = (uint16_t) strlen(field->text);
 
 	volatile uint16_t startAddress = currTxtFrame
 			+ (uint16_t) (40 * field->row + field->col - 41) + field->width;
@@ -152,5 +159,27 @@ static void clear_TextField(TextField_t* field) {
 	for (unsigned int i = 0; i <= field->width; i++) {
 		disp_wr_byte(DATA_WR_DEC_ADP, 0);
 	}
+}
+
+/**
+ * Sets the cursor i.e. the focus on this textfield.
+ */
+static void set_TextFieldFocus(TextField_t* field) {
+	size_t strLength = strlen(field->text);
+
+	/* Avoid setting the cursor outside of the TextField */
+	if(strLength > field->width) {
+		set_addressPointer(field->row, field->col + field->width);
+	} else {
+		set_addressPointer(field->row, field->col + strLength);
+	}
+}
+
+/**
+ * Set addresspointer to specified location.
+ */
+static void set_addressPointer(uint16_t row, uint16_t col) {
+	volatile uint16_t startAddress = currTxtFrame + (40 * row + col - 41);
+	disp_wr_hword(SET_ADDRESS_PIONTER, startAddress);
 }
 

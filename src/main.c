@@ -1,7 +1,15 @@
-/* Includes -------------------------------------------------------------------*/
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										INCLUDES
+ * --------------------------------------------------------------------------------------------------
+ */
 #include "main.h"
 
-/* Variables ------------------------------------------------------------------*/
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										VARIABLES
+ * --------------------------------------------------------------------------------------------------
+ */
 extern bool kpadFlag;
 TextField_t txtField1;
 TextField_t txtField2;
@@ -12,16 +20,28 @@ TextField_t infoTxt;
 TextField_t* textFields[] = { &txtField1, &txtField2, &txtField3, &txtField4 };
 uint32_t txtFIdx = 0;
 
-/* Definitions ----------------------------------------------------------------*/
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										DEFINES
+ * --------------------------------------------------------------------------------------------------
+ */
 
-/* Prototypes -----------------------------------------------------------------*/
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										PROTOTYPES
+ * --------------------------------------------------------------------------------------------------
+ */
 void lcd_example(void);
 void cbTextField1(void);
 void cbTextField2(void);
 void cbTextField3(void);
 void cbTextField4(void);
 
-/* Compiler stuff -------------------------------------------------------------*/
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										COMPILER STUFF
+ * --------------------------------------------------------------------------------------------------
+ */
 /**
  * Sample pragmas to cope with warnings. Please note the related line at
  * the end of this function, used to pop the compiler diagnostics status.
@@ -32,7 +52,11 @@ void cbTextField4(void);
 #pragma GCC diagnostic ignored "-Wreturn-type"
 #pragma GCC diagnostic ignored "-Wconversion"
 
-/* Main -----------------------------------------------------------------------*/
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										MAIN
+ * --------------------------------------------------------------------------------------------------
+ */
 
 /**
  * Normally at this stage most of the microcontroller subsystems, including
@@ -55,11 +79,11 @@ int main(int argc, char* argv[]) {
 	graph_print_textBox("~PRESS THE KEYPAD~", 2, 1, TEXT_ALIGN_CENTER);
 	graph_print_text("", 4, 1, TEXT_ALIGN_LEFT);
 
-	gui_TextField_init(&txtField1, "", 4, 2, 10, 1, cbTextField1);
-	gui_TextField_init(&txtField2, "", 6, 2, 10, 1, cbTextField2);
-	gui_TextField_init(&txtField3, "", 8, 2, 10, 1, cbTextField3);
-	gui_TextField_init(&txtField4, "", 10, 2, 10, 1, cbTextField4);
-	gui_TextField_init(&infoTxt, "", 15, 2, 36, 1, NULL);
+	gui_TextField_init(&txtField1, "", 4, 2, 10, cbTextField1);
+	gui_TextField_init(&txtField2, "", 6, 2, 10, cbTextField2);
+	gui_TextField_init(&txtField3, "", 8, 2, 10, cbTextField3);
+	gui_TextField_init(&txtField4, "", 10, 2, 10, cbTextField4);
+	gui_TextField_init(&infoTxt, "", 15, 2, 36, NULL);
 	gui_TextField_show(&txtField1);
 	gui_TextField_show(&txtField2);
 	gui_TextField_show(&txtField3);
@@ -219,4 +243,8 @@ void cbTextField4(void) {
 
 #pragma GCC diagnostic pop
 
-// ----------------------------------------------------------------------------
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										EOF
+ * --------------------------------------------------------------------------------------------------
+ */

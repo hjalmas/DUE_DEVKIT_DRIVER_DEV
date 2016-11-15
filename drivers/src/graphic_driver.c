@@ -185,8 +185,6 @@ void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height) 
 	graph_draw_line(x0, y0, x1, y0);
 }
 
-/* Private functions ----------------------------------------------------------------------------------*/
-
 /**
  * Converts from ascii to display text.
  */
@@ -194,3 +192,5 @@ uint8_t a2dispTxt(char ascii) {
 	volatile uint8_t result = ascii - 0x20;
 	return result;
 }
+
+/* Private functions ----------------------------------------------------------------------------------*/

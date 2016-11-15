@@ -61,6 +61,9 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
  */
 void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
 
+/**
+ * Converts from ascii to display text.
+ */
 uint8_t a2dispTxt(char ascii);
 
 #endif /* GRAPHIC_DRIVER_H_ */
