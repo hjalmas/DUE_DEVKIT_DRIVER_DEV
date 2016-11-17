@@ -13,6 +13,7 @@
 #include <limits.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 #include "diag/Trace.h"
 #include "cmsis_device.h"
 #include "sam3x_conf.h"
@@ -49,17 +50,17 @@ void graph_clear_char(uint8_t row, uint8_t col);
 /**
  * Draws a pixel at the specified location on the screen;
  */
-void graph_draw_pixel(uint16_t x, uint16_t y);
+void graph_draw_pixel(uint16_t x, uint16_t y, bool value);
 
 /**
  * Draws a line between (x0, y0) and (x1, y1) on the display.
  */
-void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool value);
 
 /**
  * Draws a rectangle with (x0, y0) in the upper left corner.
  */
-void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height);
+void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, bool value);
 
 /**
  * Converts from ascii to display text.

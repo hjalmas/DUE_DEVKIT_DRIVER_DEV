@@ -50,7 +50,7 @@ void kpad_init(void) {
 	pio_set_pin(KPAD_PORT, KPAD_COL_MSK, 0);
 
 	/* Initialize inputs from keypad */
-	pio_init_pin(KPAD_PORT, KPAD_ROW_MSK, PIO_INPUT);
+	pio_init_pin(KPAD_PORT, KPAD_ROW_MSK, PIO_INPUT | PIO_PULLUP);
 	pio_init_debounce(KPAD_PORT, KPAD_ROW_MSK, 16);
 	pio_init_interrupt(KPAD_PORT, KPAD_ROW_MSK, INT_EDG_FALLING);
 }

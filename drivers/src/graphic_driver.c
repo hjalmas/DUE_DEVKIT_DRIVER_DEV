@@ -69,7 +69,7 @@ void graph_print_textBox(char* txt, uint8_t row, uint8_t col,
 
 	volatile uint16_t rectWidth = txtLength * 6 + 3;
 	volatile uint16_t x0 = (nCol - 1) * 6 - 1, y0 = (row - 1) * 8 - 2;
-	graph_draw_rect(x0, y0, rectWidth, 11);
+	graph_draw_rect(x0, y0, rectWidth, 11, true);
 	graph_print_text(txt, row, col, TEXT_ALIGN);
 }
 
@@ -86,17 +86,21 @@ void graph_clear_char(uint8_t row, uint8_t col) {
 /**
  * Draws a pixel at the specified location on the screen;
  */
-void graph_draw_pixel(uint16_t x, uint16_t y) {
+void graph_draw_pixel(uint16_t x, uint16_t y, bool value) {
 	volatile uint16_t address = currGraphFrame + x / 6 + y * 40;
 	disp_wr_hword(SET_ADDRESS_PIONTER, address);
 	volatile uint8_t currData = disp_rd_byte(DATA_RD);
-	disp_wr_byte(DATA_WR, (0x20 >> (x % 6)) | currData);
+	if(value) {
+		disp_wr_byte(DATA_WR, (0x20 >> (x % 6)) | currData);
+	} else {
+		disp_wr_byte(DATA_WR, ~(0x20 >> (x % 6)) & currData);
+	}
 }
 
 /**
  * Draws a line between (x0, y0) and (x1, y1) on the display.
  */
-void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool value) {
 	volatile int32_t dx = (int32_t) (x1 - x0), dy = (int32_t) (y1 - y0);
 	volatile int32_t threshold = 0;
 	volatile int32_t slope = abs((dy * 100000) / dx);
@@ -107,9 +111,9 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 		for (; y <= yLim; y++) {
 
 			if (dy > 0) {
-				graph_draw_pixel(x0, y0 + y);
+				graph_draw_pixel(x0, y0 + y, value);
 			} else {
-				graph_draw_pixel(x0, y0 - y);
+				graph_draw_pixel(x0, y0 - y, value);
 			}
 
 		}
@@ -118,9 +122,9 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 		for (; x <= xLim; x++) {
 
 			if (dx > 0) {
-				graph_draw_pixel(x0 + x, y0);
+				graph_draw_pixel(x0 + x, y0, value);
 			} else {
-				graph_draw_pixel(x0 - x, y0);
+				graph_draw_pixel(x0 - x, y0, value);
 			}
 
 		}
@@ -132,13 +136,13 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 		for (; x <= xLim; x++) {
 
 			if (dx > 0 && dy > 0) {
-				graph_draw_pixel(x0 + x, y0 + y);
+				graph_draw_pixel(x0 + x, y0 + y, value);
 			} else if (dx < 0 && dy > 0) {
-				graph_draw_pixel(x0 - x, y0 + y);
+				graph_draw_pixel(x0 - x, y0 + y, value);
 			} else if (dx < 0 && dy < 0) {
-				graph_draw_pixel(x0 - x, y0 - y);
+				graph_draw_pixel(x0 - x, y0 - y, value);
 			} else {
-				graph_draw_pixel(x0 + x, y0 - y);
+				graph_draw_pixel(x0 + x, y0 - y, value);
 			}
 
 			threshold += slope;
@@ -154,13 +158,13 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 		for (; y <= yLim; y++) {
 
 			if (dx > 0 && dy > 0) {
-				graph_draw_pixel(x0 + x, y0 + y);
+				graph_draw_pixel(x0 + x, y0 + y, value);
 			} else if (dx < 0 && dy > 0) {
-				graph_draw_pixel(x0 - x, y0 + y);
+				graph_draw_pixel(x0 - x, y0 + y, value);
 			} else if (dx < 0 && dy < 0) {
-				graph_draw_pixel(x0 - x, y0 - y);
+				graph_draw_pixel(x0 - x, y0 - y, value);
 			} else {
-				graph_draw_pixel(x0 + x, y0 - y);
+				graph_draw_pixel(x0 + x, y0 - y, value);
 			}
 
 			threshold += slope;
@@ -176,13 +180,13 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 /**
  * Draws a rectangle with (x0, y0) in the upper left corner.
  */
-void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height) {
+void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, bool value) {
 
 	volatile uint16_t x1 = x0 + width - 1, y1 = y0 + height - 1;
-	graph_draw_line(x0, y0, x0, y1);
-	graph_draw_line(x0, y1, x1, y1);
-	graph_draw_line(x1, y1, x1, y0);
-	graph_draw_line(x0, y0, x1, y0);
+	graph_draw_line(x0, y0, x0, y1, value);
+	graph_draw_line(x0, y1, x1, y1, value);
+	graph_draw_line(x1, y1, x1, y0, value);
+	graph_draw_line(x0, y0, x1, y0, value);
 }
 
 /**
