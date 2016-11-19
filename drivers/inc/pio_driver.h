@@ -24,6 +24,7 @@
 #define PIO_INPUT 				1 << 0		/* Configure pin as input */
 #define PIO_OUTPUT				1 << 1		/* Configure pin as output */
 #define PIO_PULLUP				1 << 2		/* Use pullup */
+#define PIO_OPENDRAIN			1 << 3		/* Use multidriver */
 
 /* PIO interrupt settings */
 #define INT_EDG_FALLING 		1 << 0 		/* Falling edge detection */

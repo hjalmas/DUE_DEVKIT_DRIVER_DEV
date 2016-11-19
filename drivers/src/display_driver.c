@@ -65,7 +65,7 @@ void disp_init(void) {
 
 	/* Reset the display */
 	pio_set_pin(DISP_RST_PORT, DISP_RST, 0);
-	delay(100);
+	delay(1000);
 	pio_set_pin(DISP_RST_PORT, DISP_RST, 1);
 
 	/* set up display */
@@ -131,6 +131,7 @@ void disp_wr_cmd(uint8_t cmd) {
 	write_databus(cmd);
 	DISP_PORT->PIO_SODR = DISP_CD;				/* Enable Command mode */
 	DISP_PORT->PIO_CODR = DISP_WR | DISP_CE;	/* Select display and enable write mode */
+	delay(10);
 	DISP_PORT->PIO_SODR = DISP_WR | DISP_CE;	/* Deselect display and disable write mode */
 	disable_databus();
 	set_databusDir(DATABUS_INPUT);

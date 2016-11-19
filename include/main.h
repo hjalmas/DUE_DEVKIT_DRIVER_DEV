@@ -18,6 +18,7 @@
 #include "../drivers/inc/graphic_driver.h"
 #include "../drivers/inc/keypad_driver.h"
 #include "../drivers/inc/gui_components.h"
+#include "../drivers/inc/tempsensor_driver.h"
 
 
 #endif

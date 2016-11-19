@@ -3,6 +3,7 @@
  * 										INCLUDES
  * --------------------------------------------------------------------------------------------------
  */
+
 #include "main.h"
 
 /**
@@ -11,16 +12,8 @@
  * --------------------------------------------------------------------------------------------------
  */
 extern bool kpadFlag;
-TextField_t txtField1;
-TextField_t txtField2;
-TextField_t txtField3;
-TextField_t txtField4;
-TextField_t infoTxt;
-
-Button_t returnButton;
-
-void* textFields[] = { &txtField1, &txtField2, &txtField3, &txtField4, &returnButton};
-uint32_t txtFIdx = 0;
+static bool tempFlag = false;
+static uint32_t ticks = 0;
 
 /**
  * --------------------------------------------------------------------------------------------------
@@ -34,13 +27,12 @@ uint32_t txtFIdx = 0;
  * --------------------------------------------------------------------------------------------------
  */
 void lcd_init(void);
-void gui_init(void);
-void cbKeyPress(void);
-void cbTextField1(void);
-void cbTextField2(void);
-void cbTextField3(void);
-void cbTextField4(void);
-void cbReturnButton(void);
+extern void gui_init(void);
+extern void cbKeyPress(void);
+extern void cbTempSensor(void);
+
+void delay_ms(uint32_t t_ms);
+uint32_t getTicks(void);
 
 /**
  * --------------------------------------------------------------------------------------------------
@@ -78,14 +70,23 @@ int main(int argc, char* argv[]) {
 #ifdef DEBUG
 	trace_puts("DEBUG is running...\n");
 #endif
+	/* initialize 1ms timebase */
+	SysTick_Config(SystemCoreClock/1000);
 
+	/* Initialize hardware and software stack*/
 	kpad_init();
 	lcd_init();
 	gui_init();
+	temp_init();
 
 	while (1) {
 		if (kpadFlag) {
 			cbKeyPress();
+		}
+
+		if(tempFlag) {
+			cbTempSensor();
+			tempFlag = false;
 		}
 	}
 
@@ -95,7 +96,6 @@ int main(int argc, char* argv[]) {
 void lcd_init(void) {
 	disp_init();
 	disp_wr_cmd(CURS_ON_BLINK_ON | TEXT_ON_GRAPHIC_ON);
-	//disp_wr_cmd(TEXT_ON_GRAPHIC_ON);
 	disp_wr_cmd(CURSOR_8_LINE);
 	disp_wr_hword(CURSOR_AUTOMOVE, 0x0001);
 	disp_wr_hword(SET_ADDRESS_PIONTER, FRAME_TEXT_1);
@@ -155,114 +155,40 @@ void lcd_init(void) {
 	 */
 }
 
-void gui_init(void) {
-	graph_print_textBox("~PRESS THE KEYPAD~", 2, 1, TEXT_ALIGN_CENTER);
-	graph_print_text("", 4, 1, TEXT_ALIGN_LEFT);
-
-	gui_TextField_init(&txtField1, "", 4, 2, 10, cbTextField1);
-	gui_TextField_show(&txtField1);
-
-	gui_TextField_init(&txtField2, "", 6, 2, 10, cbTextField2);
-	gui_TextField_show(&txtField2);
-
-	gui_TextField_init(&txtField3, "", 8, 2, 10, cbTextField3);
-	gui_TextField_show(&txtField3);
-
-	gui_TextField_init(&txtField4, "", 10, 2, 10, cbTextField4);
-	gui_TextField_show(&txtField4);
-
-	gui_TextField_init(&infoTxt, "", 15, 2, 36, NULL);
-	gui_TextField_show(&infoTxt);
-
-	gui_Button_init(&returnButton,"Return", 12, 3, 8, cbReturnButton);
-	gui_Button_show(&returnButton);
-
-
-
-
-	gui_select_component(&txtField1);
+/**
+ * returns the current ticks value.
+ */
+uint32_t getTicks(void) {
+	return ticks;
 }
 
-void cbKeyPress(void) {
-	volatile uint32_t key = kpad_get_key();
+/**
+ * Delays execution for the specified amount of ms.
+ */
+void delay_ms(uint32_t t_ms) {
+	volatile uint32_t t0 = ticks;
+	while(t_ms > getTicks() - t0) {
+		asm("NOP");
+	};
+}
 
-	switch (key) {
-	case KEY_0:
-		gui_handle_keypress('0');
-		break;
-	case KEY_1:
-		gui_handle_keypress('1');
-		break;
-	case KEY_2:
-		gui_handle_keypress('2');
-		break;
-	case KEY_3:
-		gui_handle_keypress('3');
-		break;
-	case KEY_4:
-		gui_handle_keypress('4');
-		break;
-	case KEY_5:
-		gui_handle_keypress('5');
-		break;
-	case KEY_6:
-		gui_handle_keypress('6');
-		break;
-	case KEY_7:
-		gui_handle_keypress('7');
-		break;
-	case KEY_8:
-		gui_handle_keypress('8');
-		break;
-	case KEY_9:
-		gui_handle_keypress('9');
-		break;
-	case KEY_A:
-		txtFIdx == 0 ? txtFIdx = 4 : txtFIdx--;
-		gui_select_component(textFields[txtFIdx]);
-		break;
-	case KEY_B:
-		txtFIdx == 4 ? txtFIdx = 0 : txtFIdx++;
-		gui_select_component(textFields[txtFIdx]);
-		break;
-	case KEY_C:
-		gui_handle_keypress(0x08);
-		break;
-	case KEY_D:
-		gui_handle_keypress(0x0D);
-		break;
-	default:
-		break;
+/**
+ * --------------------------------------------------------------------------------------------------
+ * 										INTERRUPT HANDLERS
+ * --------------------------------------------------------------------------------------------------
+ */
+void SysTick_Handler(void) {
+	ticks++;
 
+	if(ticks % 250 == 0) {
+		temp_trig();
 	}
+
 }
 
-void cbTextField1(void) {
-	char text[40] = "TextField 1: ";
-	strcat(text, txtField1.text);
-	gui_TextField_setText(&infoTxt, text);
-}
-
-void cbTextField2(void) {
-	char text[40] = "TextField 2: ";
-	strcat(text, txtField2.text);
-	gui_TextField_setText(&infoTxt, text);
-}
-
-void cbTextField3(void) {
-	char text[40] = "TextField 3: ";
-	strcat(text, txtField3.text);
-	gui_TextField_setText(&infoTxt, text);
-}
-
-void cbTextField4(void) {
-	char text[40] = "TextField 4: ";
-	strcat(text, txtField4.text);
-	gui_TextField_setText(&infoTxt, text);
-}
-
-void cbReturnButton(void) {
-	gui_TextField_setText(&infoTxt, "Return button was pressed!");
+void TC0_Handler(void) {
+	volatile uint32_t dummy = TC0->TC_CHANNEL[0].TC_SR;
+	tempFlag = true;
 }
 
 #pragma GCC diagnostic pop

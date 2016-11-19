@@ -31,6 +31,13 @@ void pio_init_pin(Pio* PIO, uint32_t PIN, uint32_t Settings) {
 		PIO->PIO_OER = PIN;
 	}
 
+	/* Config open drain */
+	if (Settings & PIO_OPENDRAIN) {
+		PIO->PIO_MDER = PIN;
+	} else {
+		PIO->PIO_MDDR = PIN;
+	}
+
 	/* Configure pullup */
 	if (Settings & PIO_PULLUP) {
 		PIO->PIO_PUER = PIN;
