@@ -190,6 +190,31 @@ void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, 
 }
 
 /**
+ * Draws a circle with center (x0, y0) and radius r.
+ */
+void graph_draw_circle(uint16_t x0, uint16_t y0, uint16_t r, bool value) {
+	volatile int32_t x = r, y = 0, err = 0;
+
+	while (x >= y) {
+		graph_draw_pixel((int32_t)x0 + x, (int32_t)y0 + y, value);
+		graph_draw_pixel((int32_t)x0 + y, (int32_t)y0 + x, value);
+		graph_draw_pixel((int32_t)x0 - y, (int32_t)y0 + x, value);
+		graph_draw_pixel((int32_t)x0 - x, (int32_t)y0 + y, value);
+		graph_draw_pixel((int32_t)x0 - x, (int32_t)y0 - y, value);
+		graph_draw_pixel((int32_t)x0 - y, (int32_t)y0 - x, value);
+		graph_draw_pixel((int32_t)x0 + y, (int32_t)y0 - x, value);
+		graph_draw_pixel((int32_t)x0 + x, (int32_t)y0 - y, value);
+
+	    y++;
+	    err += 1 + 2*y;
+	    if (2*(err-x) + 1 > 0) {
+	        x--;
+	        err += 1 - 2*x;
+	    }
+	 }
+}
+
+/**
  * Converts from ascii to display text.
  */
 uint8_t a2dispTxt(char ascii) {

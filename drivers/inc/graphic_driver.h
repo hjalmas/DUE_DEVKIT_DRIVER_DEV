@@ -63,6 +63,11 @@ void graph_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, bool va
 void graph_draw_rect(uint16_t x0, uint16_t y0, uint16_t width, uint16_t height, bool value);
 
 /**
+ * Draws a circle with center (x0, y0) and radius r.
+ */
+void graph_draw_circle(uint16_t x0, uint16_t y0, uint16_t r, bool value);
+
+/**
  * Converts from ascii to display text.
  */
 uint8_t a2dispTxt(char ascii);

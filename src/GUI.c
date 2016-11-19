@@ -67,6 +67,9 @@ void cbMenuSettingsBtn(void);
 /* Live weather data Callbacks -------------*/
 void cbReturnButton(void);
 
+/* Private functions -----------------------*/
+static void degCelsius(uint16_t row, uint16_t col);
+
 /**
  * -----------------------------------------------------------------------------------------------------
  * 												DECLARATIONS
@@ -197,11 +200,12 @@ void cbTempSensor(void) {
 
 	volatile uint32_t val = temp_read();
 	char* str = malloc(12);
-	sprintf(str, "  %d.%d", val/100, val%100);
-	if(strlen(str) < 7) {
+	sprintf(str, "%d.%d", val/100, val%100);
+	if(strlen(str) < 5) {
 		strcat(str, "0");
 	}
 	gui_TextField_setText(&tempTxtField, str);
+	degCelsius(tempTxtField.row, tempTxtField.col + 5);
 
 	free(str);
 }
@@ -236,4 +240,17 @@ void cbMenuSettingsBtn(void) {
 void cbReturnButton(void) {
 	gui_select_component(&menuLiveWatherDataBtn);
 	showMainMenu();
+}
+
+/**
+ * -----------------------------------------------------------------------------------------------------
+ * 												PRIVATE FUNCTIONS
+ * -----------------------------------------------------------------------------------------------------
+ */
+static void degCelsius(uint16_t row, uint16_t col) {
+	graph_print_text("C", row, col+1, TEXT_ALIGN_LEFT);
+	volatile uint16_t x0 = 0, y0 = 0;
+	y0 = 8 * (row-1) + 1;
+	x0 = 6 * (col-1) + 4;
+	graph_draw_circle(x0, y0, 2, true);
 }
