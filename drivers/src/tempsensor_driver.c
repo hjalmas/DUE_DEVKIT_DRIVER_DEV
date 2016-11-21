@@ -24,6 +24,7 @@
  * 												TYPEDEFS, variables
  * -----------------------------------------------------------------------------------------------------
  */
+uint32_t temperatureAcqInterval = 100;
 
 /**
  * -----------------------------------------------------------------------------------------------------
@@ -81,6 +82,13 @@ void temp_trig(void) {
 
 	/* Enable interrupts */
 	tc_enable_interrupt(TEMP_TC, TEMP_TC_CHANNEL, TC_IER_LDRBS);
+}
+
+/**
+ * Sets the time interval between consecutive samples.
+ */
+void temp_set_acqInterval(uint32_t t_ms) {
+
 }
 
 /**

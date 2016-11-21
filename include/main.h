@@ -19,6 +19,8 @@
 #include "../drivers/inc/keypad_driver.h"
 #include "../drivers/inc/gui_components.h"
 #include "../drivers/inc/tempsensor_driver.h"
+#include "../drivers/inc/twi_driver.h"
+#include "../drivers/inc/MPL311_driver.h"
 
 
 #endif

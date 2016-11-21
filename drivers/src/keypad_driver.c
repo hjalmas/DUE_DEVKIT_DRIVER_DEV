@@ -24,7 +24,9 @@
  * -----------------------------------------------------------------------------------------------------
  */
 bool kpadFlag = false;
-uint32_t kpadRow = 0, kpadCol = 0, currKey = 0;
+uint32_t kpadRow = 0;
+uint32_t kpadCol = 0;
+uint32_t currKey = 0;
 uint32_t selectedCol = 0;
 uint32_t kpadCols[] = { KPAD_COL_1, KPAD_COL_2, KPAD_COL_3, KPAD_COL_4 };
 
@@ -120,20 +122,6 @@ uint32_t kpad_get_key(void) {
 	kpadFlag = false;
 
 	return newRow * 4 + newCol;
-}
-
-
-void PIOD_Handler() {
-	kpadRow = PIOD->PIO_ISR & KPAD_ROW_MSK;
-
-	/* if keypad was pressed */
-	if (!kpadFlag) {
-		kpadFlag = true;
-		KPAD_PORT->PIO_IFDR = KPAD_ROW_MSK; 	/* Disable debounce */
-	} else {
-		kpadCol = selectedCol;
-		KPAD_PORT->PIO_IFER = KPAD_ROW_MSK; 	/* Enable debounce */
-	}
 }
 
 static void delay(uint32_t cycles) {

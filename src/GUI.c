@@ -10,6 +10,7 @@
  * -----------------------------------------------------------------------------------------------------
  */
 #include "main.h"
+
 /**
  * -----------------------------------------------------------------------------------------------------
  * 												DEFINES
@@ -39,9 +40,9 @@ void* componentsMM[] = {
 };
 uint32_t menuIdx = 0;
 
-/* Page 1 components --------------*/
+/* Live wather data page components --------------*/
 TextField_t tempTxtField;
-TextField_t txtField2;
+TextField_t presTxtField;
 TextField_t txtField3;
 TextField_t txtField4;
 Button_t returnButton;
@@ -51,12 +52,16 @@ Button_t returnButton;
  * 												PROTOTYPES
  * -----------------------------------------------------------------------------------------------------
  */
+/* GUI functions ----------------*/
 void gui_init(void);
-void cbKeyPress(void);
-void cbTempSensor(void);
-
 void showMainMenu(void);
 void showLiveWeatherData(void);
+void showErrorPage(char** messages);
+
+/* Peripheral callback functions-*/
+void cbKeyPress(void);
+void cbTempSensor(void);
+void cbBarometer(void);
 
 /* Main menu callbacks ----------*/
 void cbMenuLiveWeatherDataBtn(void);
@@ -69,6 +74,8 @@ void cbReturnButton(void);
 
 /* Private functions -----------------------*/
 static void degCelsius(uint16_t row, uint16_t col);
+static void toTmpStr(char* strBuffer, uint32_t val);
+static void toPressStr(char* strBuffer, uint32_t val);
 
 /**
  * -----------------------------------------------------------------------------------------------------
@@ -76,6 +83,9 @@ static void degCelsius(uint16_t row, uint16_t col);
  * -----------------------------------------------------------------------------------------------------
  */
 
+/**
+ * Initialize the graphical user interface.
+ */
 void gui_init(void) {
 
 	/* Initialize main menu components */
@@ -85,10 +95,10 @@ void gui_init(void) {
 	gui_Button_init(&menuSettingsBtn,"Settings", 13, 10, 20, cbMenuSettingsBtn);
 
 	/* Initialize Live weather data components */
-	gui_TextField_init(&tempTxtField, "", 6, 25, 6, NULL);
-	gui_TextField_init(&txtField2, "", 8, 25, 6, NULL);
-	gui_TextField_init(&txtField3, "", 10, 25, 6, NULL);
-	gui_TextField_init(&txtField4, "", 12, 25, 6, NULL);
+	gui_TextField_init(&tempTxtField, "", 6, 23, 6, NULL);
+	gui_TextField_init(&presTxtField, "", 8, 23, 6, NULL);
+	gui_TextField_init(&txtField3, "", 10, 23, 6, NULL);
+	gui_TextField_init(&txtField4, "", 12, 23, 6, NULL);
 	gui_Button_init(&returnButton,"Return To Main Menu", 14, 9, 22, cbReturnButton);
 
 	showMainMenu();
@@ -113,7 +123,7 @@ void showMainMenu(void) {
 }
 
 /**
- * Display page 1 on the screen.
+ * Display the Live weather data page on the screen.
  */
 void showLiveWeatherData(void) {
 	currPage = LIVE_WEATHER;
@@ -124,13 +134,32 @@ void showLiveWeatherData(void) {
 	graph_print_text("Temperature: ", 6, 9, TEXT_ALIGN_LEFT);
 	gui_TextField_show(&tempTxtField);
 	graph_print_text("Air Pressure: ", 8, 9, TEXT_ALIGN_LEFT);
-	gui_TextField_show(&txtField2);
+	gui_TextField_show(&presTxtField);
 	gui_TextField_show(&txtField3);
 	gui_TextField_show(&txtField4);
 	gui_Button_show(&returnButton);
 	gui_select_component(&returnButton);
+
+	degCelsius(tempTxtField.row, tempTxtField.col + 8);
+	graph_print_text("kPa", presTxtField.row, presTxtField.col + 8, TEXT_ALIGN_LEFT);
 }
 
+/**
+ * Show the error page on the screen.
+ */
+void showErrorPage(char** messages) {
+
+}
+
+/**
+ * -----------------------------------------------------------------------------------------------------
+ * 										PERIPHERAL CALLBACK FUNCTIONS
+ * -----------------------------------------------------------------------------------------------------
+ */
+
+/**
+ * Callback function to handle key-presses.
+ */
 void cbKeyPress(void) {
 	volatile uint32_t key = kpad_get_key();
 
@@ -193,21 +222,36 @@ void cbKeyPress(void) {
 	}
 }
 
+/**
+ * Callback function to handle temperature sensor events.
+ */
 void cbTempSensor(void) {
 	if(currPage != LIVE_WEATHER) {
 		return;
 	}
 
+	char str[6];
 	volatile uint32_t val = temp_read();
-	char* str = malloc(12);
-	sprintf(str, "%d.%d", val/100, val%100);
-	if(strlen(str) < 5) {
-		strcat(str, "0");
-	}
+	toTmpStr(str, val);
 	gui_TextField_setText(&tempTxtField, str);
-	degCelsius(tempTxtField.row, tempTxtField.col + 5);
+}
 
-	free(str);
+/**
+ * Callback function to handle Barometer events.
+ */
+void cbBarometer(void) {
+	volatile uint8_t flags = MPL_read_flags();
+
+	if(currPage != LIVE_WEATHER) {
+		MPL_clear_interrupts();
+		return;
+	}
+
+	char str[7];
+	volatile uint32_t val = MPL_read_pressure();
+	toPressStr(str, val);
+	gui_TextField_setText(&presTxtField, str);
+	MPL_clear_interrupts();
 }
 
 /**
@@ -253,4 +297,29 @@ static void degCelsius(uint16_t row, uint16_t col) {
 	y0 = 8 * (row-1) + 1;
 	x0 = 6 * (col-1) + 4;
 	graph_draw_circle(x0, y0, 2, true);
+}
+
+/**
+ * Convert a integer value to a string, appropriate for the temperature data.
+ */
+static void toTmpStr(char* strBuffer, uint32_t val) {
+	strBuffer[0] = 0x30 + (val/1000) % 10;
+	strBuffer[1] = 0x30 + (val/100) % 10;
+	strBuffer[2] = '\.';
+	strBuffer[3] = 0x30 + (val/10) % 10;
+	strBuffer[4] = 0x30 + val % 10;
+	strBuffer[5] = '\0';
+}
+
+/**
+ * Convert a integer value to a string, appropriate for the pressure data.
+ */
+static void toPressStr(char* strBuffer, uint32_t val) {
+	strBuffer[0] = 0x30 + (val/100000) % 10;
+	strBuffer[1] = 0x30 + (val/10000) % 10;
+	strBuffer[2] = 0x30 + (val/1000) % 10;
+	strBuffer[3] = '\.';
+	strBuffer[4] = 0x30 + (val/100) % 10;
+	strBuffer[5] = 0x30 + (val/10) % 10;
+	strBuffer[6] = '\0';
 }
